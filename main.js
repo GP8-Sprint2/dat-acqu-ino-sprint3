@@ -16,7 +16,7 @@ const HABILITAR_OPERACAO_INSERIR = true;
 // altere o valor da variável AMBIENTE para o valor desejado:
 // API conectada ao banco de dados remoto, SQL Server -> 'producao'
 // API conectada ao banco de dados local, MySQL Workbench - 'desenvolvimento'
-const AMBIENTE = 'desenvolvimento';
+const AMBIENTE = 'producao';
 
 const serial = async (
     valoresDht11Umidade,
@@ -34,12 +34,28 @@ const serial = async (
                 // CREDENCIAIS DO BANCO LOCAL - MYSQL WORKBENCH
                 host: 'localhost',
                 user: 'root',
-                password: 'Victor2003!',
+                password: '56674894',
                 database: 'GrandVinum'
             }
         ).promise();
     } else if (AMBIENTE == 'producao') {
         console.log('Projeto rodando inserindo dados em nuvem. Configure as credenciais abaixo.');
+        // poolBancoDados = mysql.createPool(
+        //     {
+        //         server: "projetograndvinum.database.windows.net",
+        //         database: "Grand Vinum",
+        //         user: "admin-projeto-grandvinum",
+        //         password: "#Gfgrupo8",
+        //         pool: {
+        //             max: 10,
+        //             min: 0,
+        //             idleTimeoutMillis: 30000
+        //         },
+        //         options: {
+        //             encrypt: true, // for azure
+        //         }
+        //     }
+        // ).promise();
     } else {
         throw new Error('Ambiente não configurado. Verifique o arquivo "main.js" e tente novamente.');
     }
@@ -81,16 +97,17 @@ const serial = async (
                 // -> altere nome da tabela e colunas se necessário
                 // Este insert irá inserir dados de fk_aquario id=1 (fixo no comando do insert abaixo)
                 // >> Importante! você deve ter o aquario de id 1 cadastrado.
-                sqlquery = `INSERT INTO medida (dht11_umidade, dht11_temperatura, luminosidade, lm35_temperatura, chave, momento, fk_aquario) VALUES (${dht11Umidade}, ${dht11Temperatura}, ${luminosidade}, ${lm35Temperatura}, ${chave}, CURRENT_TIMESTAMP, 1)`;
+                sqlquery = `INSERT INTO metrica (dataHora, umidade, temperatura_C, fkBarrilVinho) VALUES (CURRENT_TIMESTAMP, ${dht11Umidade}, ${dht11Temperatura}, 3)`
+                  
 
                 // CREDENCIAIS DO BANCO REMOTO - SQL SERVER
                 // Importante! você deve ter criado o usuário abaixo com os comandos presentes no arquivo
                 // "script-criacao-usuario-sqlserver.sql", presente neste diretório.
-                const connStr = "Server=servidor-acquatec.database.windows.net;Database=bd-acquatec;User Id=usuarioParaAPIArduino_datawriter;Password=#Gf_senhaParaAPI;";
+                const connStr = "Server=projetograndvinum.database.windows.net;Database=Grand Vinum;User Id=admin-projeto-grandvinum;Password=#Gfgrupo8;";
 
                 function inserirComando(conn, sqlquery) {
                     conn.query(sqlquery);
-                    console.log("valores inseridos no banco: ", dht11Umidade + ", " + dht11Temperatura + ", " + luminosidade + ", " + lm35Temperatura + ", " + chave)
+                    console.log("valores inseridos no banco: ", " + umidade + ", " + temperatura_C")
                 }
 
                 sql.connect(connStr)
